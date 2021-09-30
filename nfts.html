@@ -321,6 +321,7 @@
                 let balance = await this.FNTC['balanceOf'](window.tronWeb.defaultAddress.base58).call()
                 for(var i=0;i<balance;i++){
                     let tokenId = await this.FNTC['tokenOfOwnerByIndex'](window.tronWeb.defaultAddress.base58,i).call()
+                    tokenId = parseInt(tokenId)
                     let card = this.gemList.filter((item)=>{
                         return item.tokenIds.includes(tokenId)
                     })
