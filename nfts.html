@@ -159,7 +159,7 @@
                         <img :src="item.hero">
                         <h3 class="name">{{item.heroName}}({{item.name}})</h3>
                         <p class="price">回购价格  <span>{{item.purchase}} IGC</span></p>
-                        <el-button class="btn" @click="purGems">立即回购</el-button>
+                        <el-button class="btn" @click="purGems(item,index)">立即回购</el-button>
                     </li>
                 </ul>
                 <img class="shoutao" src="./images/InfinityStones-Infographic-01-740x740.jpg">
@@ -408,17 +408,17 @@
                     }
                 })
             },
-            purGems(){
-                alert('您未持有该宝石！')
-            },
-            async purStones(item,index){
+            purGems(item,index){
                 if(item.isAllApproved){
-                    this.sale(item,index)
+                    this.sale(item)
                 }else{
                     await this.FNTC['setApprovalForAll'](item.contract,true).call()
                     item.isAllApproved = true
                     this.$set(this.gemList,index,item)
                 }
+            },
+            async purStones(){
+                
                 alert('您未持有无限手套！')
             },
             async sale(item){
@@ -446,6 +446,8 @@
                                 alert('回购成功')
                             })
                         })
+                }else{
+                    alert('您未持有该宝石！')
                 }
             },
             initTronWeb() { // 初始化tronweb
