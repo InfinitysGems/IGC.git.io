@@ -408,7 +408,7 @@
                     }
                 })
             },
-            purGems(item,index){
+            async purGems(item,index){
                 if(item.isAllApproved){
                     this.sale(item)
                 }else{
@@ -417,7 +417,7 @@
                     this.$set(this.gemList,index,item)
                 }
             },
-            async purStones(){
+            purStones(){
                 
                 alert('您未持有无限手套！')
             },
