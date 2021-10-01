@@ -130,7 +130,7 @@
         </div>
     </div>
 </section>
-    <div class="igcCon" id="app">
+    <div class="igcCon" id="app" v-clock>
         <div class="advert-top" v-if="text">
             <div class="ico-horn">
                 <!-- 喇叭图标 -->
@@ -552,6 +552,9 @@
     // })(document, window);
   </script>
   <style>
+      [v-clock]{
+          display:none;
+      }
       body{
           background:#efefef;
       }
@@ -572,6 +575,7 @@
       .nftProItem {
           text-align:center;
           margin:0 20px 40px;
+          height:760px;
       }
       .nftProItem img{
           width:85px;
