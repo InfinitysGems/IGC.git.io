@@ -166,8 +166,8 @@
                 <p class="shoutaoinfo">
                     在集齐了六颗无限宝石后，将力量、时间、空间、灵魂、现实和心灵宝石镶嵌在无限手套上可以合成终极唯一版无限手套NFT，持有者可以当作收藏品长期持有，也可以将其在各大NFT收藏品平台出售。同时，智能合约永久性回购。
                 </p>
-                <p class="purprice">回购价格  <span>1000000 IGC</span></p>
-                <el-button class="btn" @click="purStones(item,index)">立即回购</el-button>
+                <p class="purprice">回购价格  <span>{{glovePrice}} IGC</span></p>
+                <el-button class="btn" @click="purStones()">立即回购</el-button>
             </div>
         </section>
         <section class="accountPanel">
@@ -178,6 +178,7 @@
                     <h3 class="name">{{item.heroName}}({{item.name}})</h3>
                     <p class="tokenid">TokenId:{{item.tokenId}}</p>
                 </div>
+                <el-button class="btn" @click="synthesis">合成手套</el-button>
                 <p class="nodata" v-show="myNft.length==0">暂无数据</p>
             </div>
         </section>
@@ -196,8 +197,11 @@
         data: {
             TOKENC:null,
             FNTC:null,
-            NFTAddr:'TYmzx3vQVQWUiGJ65FHJ8Y4suJKN1Lb9HL',
-            tokenAddr:'TQbve2Ly9pBSbS9i6jBHTwvmBxEfuWcmu7',
+            GlovesC:null,
+            NFTAddr:'TPXqQUAXkiz9Rit7r7LMoaNYUCQvQLxRkJ',
+            tokenAddr:'TVz98u3kqqkJQVM66poytXbi5gYRuMacSe',
+            Gloves:'TQQxnrCdpRVtmbTmj2fBysjY6qP4ZiNsP1',
+            glovePrice:0,
             balance:0,
             isAllApproved:false,
             myNft:[],
@@ -218,7 +222,7 @@
                     img:'./images/PowerStone.jpg',
                     hero:'./images/NFTSz/stor.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TMHBQRjNjRgTrpZrcxEWazxezccAxPbh7e',
                     tokenIds:[10001,10002,10003,10004,10005,10006,10007,10008,10009,10010]
                 },
                 {
@@ -236,7 +240,7 @@
                     img:'./images/SpaceStone.jpg',
                     hero:'./images/NFTSbx/Captain.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TMHBQRjNjRgTrpZrcxEWazxezccAxPbh7e',
                     tokenIds:[20001,20002,20003,20004,20005,20006,20007,20008,20009,20010]
                 },
                 {
@@ -254,7 +258,7 @@
                     img:'./images/TimeStone.jpg',
                     hero:'./images/NFTSz/doctor.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TMHBQRjNjRgTrpZrcxEWazxezccAxPbh7e',
                     tokenIds:[30001,30002,30003,30004,30005,30006,30007,30008,30009,30010]
                 },
                 {
@@ -272,7 +276,7 @@
                     img:'./images/RealityStone.jpg',
                     hero:'./images/NFTSz/lei.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TMHBQRjNjRgTrpZrcxEWazxezccAxPbh7e',
                     tokenIds:[40001,40002,40003,40004,40005,40006,40007,40008,40009,40010]
                 },
                 {
@@ -290,7 +294,7 @@
                     img:'./images/MindeStone.jpg',
                     hero:'./images/NFTSz/huanshi.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TMHBQRjNjRgTrpZrcxEWazxezccAxPbh7e',
                     tokenIds:[50001,50002,50003,50004,50005,50006,50007,50008,50009,50010]
                 },
                 {
@@ -308,7 +312,7 @@
                     img:'./images/SoulStone.jpg',
                     hero:'./images/NFTSz/ironman.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TMHBQRjNjRgTrpZrcxEWazxezccAxPbh7e',
                     tokenIds:[60001,60002,60003,60004,60005,60006,60007,60008,60009,60010]
                 }
             ]
@@ -317,6 +321,7 @@
             async init(){
                 this.TOKENC = await window.tronWeb.contract().at(this.tokenAddr);
                 this.FNTC = await window.tronWeb.contract().at(this.NFTAddr);
+                this.GlovesC = await window.tronWeb.contract().at(this.Gloves);
                 let balance = await this.TOKENC.balanceOf(window.tronWeb.defaultAddress.base58).call()
                 this.balance = balance/Math.pow(10,6)
                 this.gemList.forEach((item,index) => {
@@ -368,6 +373,8 @@
                 item.isApproved = parseInt(approve)?true:false
                 item.isAllApproved = await this.FNTC['isApprovedForAll'](window.tronWeb.defaultAddress.base58, item.contract).call()
                 this.$set(this.gemList,index,item)
+                let glovePrice = await this.GlovesC['repurchasePrice']().call()
+                this.glovePrice = (glovePrice/Math.pow(10,6)).toFixed(2)
             },
             async toDoing(item,index){
                 if(item.isApproved){
@@ -428,9 +435,14 @@
                     })
                 }
             },
-            purStones(){
-                
-                alert('您未持有无限手套！')
+            async purStones(){
+                if(this.myNftTokenIds.includes(99999)){
+                    await this.GlovesC.repurchase().send({ shouldPollResponse: false }).then((res)=>{
+                        alert('成功')
+                    })
+                }else{
+                    alert('您未持有无限手套！')
+                }
             },
             async sale(item){
                 let that = this
@@ -484,7 +496,25 @@
                         }
                     }, 100)
                 })
+            },
+            async synthesis(){
+                if(this.myNft.length<5){
+                    alert('宝石余额不足')
+                    return
                 }
+                let ids = []
+                this.myNft.forEach((item,index)=>{
+                    ids.push(item.tokenId)
+                })
+                let isApproveAll = await this.FNTC['isApprovedForAll'](window.tronWeb.defaultAddress.base58,this.Gloves).call()
+                if(isApproveAll){
+                    await this.GlovesC.synthesis(ids).send({ shouldPollResponse: false }).then((res)=>{
+                        alert('合成手套成功')
+                    })
+                }else{
+                    await this.FNTC['setApprovalForAll'](this.Gloves,true).send()
+                }
+            }
         },
         async created(){
             this.initTronWeb().then(()=>{
@@ -630,8 +660,8 @@
       .purprice span{
         color: #007bff;
       }
-      .purchesePanel .btn{
-        height:36px;
+      .purchesePanel .btn,.myNftList .btn{
+          height:36px;
           background:#c79b00;
           color:#fff;
           margin:0 auto;
