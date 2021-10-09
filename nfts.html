@@ -191,6 +191,11 @@
                     <h3 class="name">{{item.heroName}}({{item.name}})</h3>
                     <p class="tokenid">TokenId:{{item.tokenId}}</p>
                 </div>
+                <div class="myNftItem" v-if="myGlove">
+                    <img src="./images/InfinityStones-Infographic-01-740x740.jpg"">
+                    <h3 class="name">无限手套</h3>
+                    <p class="tokenid">TokenId:99999</p>
+                </div>
                 <p class="nodata" v-show="myNft.length==0">暂无数据</p>
             </div>
             <el-button class="btn" v-show="myNft.length>0" @click="synthesis">合成手套</el-button>
@@ -215,6 +220,7 @@
             tokenAddr:'TVz98u3kqqkJQVM66poytXbi5gYRuMacSe',
             Gloves:'TNJr3qsitCF8nM3j9Ft51W67vMeNUEeYQS',
             glovePrice:0,
+            myGlove:false,
             balance:0,
             isAllApproved:false,
             myNft:[],
@@ -349,6 +355,9 @@
                 for(var i=0;i<balance;i++){
                     let tokenId = await this.FNTC['tokenOfOwnerByIndex'](window.tronWeb.defaultAddress.base58,i).call()
                     tokenId = parseInt(tokenId)
+                    if(tokenId==99999){
+                        this.myGlove = true
+                    }
                     let card = this.gemList.filter((item)=>{
                         return item.tokenIds.includes(tokenId)
                     })
@@ -451,7 +460,7 @@
                 }
             },
             async purStones(){
-                if(this.myNftTokenIds.includes(99999)){
+                if(this.myGlove){
                     await this.GlovesC.repurchase().send({ shouldPollResponse: false }).then((res)=>{
                         alert('成功')
                     })
