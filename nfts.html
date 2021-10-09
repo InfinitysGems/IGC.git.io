@@ -191,9 +191,9 @@
                     <h3 class="name">{{item.heroName}}({{item.name}})</h3>
                     <p class="tokenid">TokenId:{{item.tokenId}}</p>
                 </div>
-                <el-button class="btn" @click="synthesis">合成手套</el-button>
                 <p class="nodata" v-show="myNft.length==0">暂无数据</p>
             </div>
+            <el-button class="btn" v-show="myNft.length>0" @click="synthesis">合成手套</el-button>
         </section>
     </div>
     
