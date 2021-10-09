@@ -179,7 +179,7 @@
                 <p class="shoutaoinfo">
                     After collecting the six infinite gems, inlay the power, time, space, soul, reality and mind gems on the infinite glove to synthesize the ultimate unique version of the infinite glove NFT. The holder can hold it as a collection for a long time. It can be sold on major NFT collectibles platforms. At the same time, the smart contract is permanently repurchased.
                 </p>
-                <p class="purprice">Repurchase price  <span>1000000 IGC</span></p>
+                <p class="purprice">Repurchase price  <span>{{glovePrice}} IGC</span></p>
                 <el-button class="btn" @click="purStones(item,index)">Repurchase</el-button>
             </div>
         </section>
@@ -193,6 +193,7 @@
                 </div>
                 <p class="nodata" v-show="myNft.length==0">No data</p>
             </div>
+            <el-button class="btn" v-show="myNft.length>0" @click="synthesis">Synthetic gloves</el-button>
         </section>
     </div>
     
@@ -209,8 +210,12 @@
         data: {
             TOKENC:null,
             FNTC:null,
+            GlovesC:null,
             NFTAddr:'TYmzx3vQVQWUiGJ65FHJ8Y4suJKN1Lb9HL',
             tokenAddr:'TQbve2Ly9pBSbS9i6jBHTwvmBxEfuWcmu7',
+            Gloves:'TTxzuoyXbe9kZaXYoGipxRvGYUhbsQusZy',
+            glovePrice:0,
+            myGlove:false,
             balance:0,
             isAllApproved:false,
             myNft:[],
@@ -344,6 +349,9 @@
                 for(var i=0;i<balance;i++){
                     let tokenId = await this.FNTC['tokenOfOwnerByIndex'](window.tronWeb.defaultAddress.base58,i).call()
                     tokenId = parseInt(tokenId)
+                    if(tokenId==99999){
+                        this.myGlove = true
+                    }
                     let card = this.gemList.filter((item)=>{
                         return item.tokenIds.includes(tokenId)
                     })
@@ -383,6 +391,8 @@
                 item.isApproved = parseInt(approve)?true:false
                 item.isAllApproved = await this.FNTC['isApprovedForAll'](window.tronWeb.defaultAddress.base58, item.contract).call()
                 this.$set(this.gemList,index,item)
+                let glovePrice = await this.GlovesC['repurchasePrice']().call()
+                this.glovePrice = (glovePrice/Math.pow(10,6)).toFixed(2)
             },
             async toDoing(item,index){
                 if(item.isApproved){
@@ -443,9 +453,14 @@
                     })
                 }
             },
-            purStones(){
-                
-                alert('您未持有无限手套！')
+            async purStones(){
+                if(this.myGlove){
+                    await this.GlovesC.repurchase().send({ shouldPollResponse: false }).then((res)=>{
+                        alert('成功')
+                    })
+                }else{
+                    alert('You do not have infinite gloves！')
+                }
             },
             async sale(item){
                 let that = this
@@ -514,7 +529,25 @@
                         }
                     }, 100)
                 })
+            },
+            async synthesis(){
+                if(this.myNft.length<5){
+                    alert('宝石余额不足')
+                    return
                 }
+                let ids = []
+                this.myNft.forEach((item,index)=>{
+                    ids.push(item.tokenId)
+                })
+                let isApproveAll = await this.FNTC['isApprovedForAll'](window.tronWeb.defaultAddress.base58,this.Gloves).call()
+                if(isApproveAll){
+                    await this.GlovesC.synthesis(ids).send({ shouldPollResponse: true }).then((res)=>{
+                        alert('合成手套成功')
+                    })
+                }else{
+                    await this.FNTC['setApprovalForAll'](this.Gloves,true).send()
+                }
+            }
         },
         async created(){
             this.initTronWeb().then(()=>{
@@ -700,7 +733,10 @@
       .purList .purItem .price span{
           color:#007bff;
       }
-      .purList .purItem .btn{
+      .accountPanel{
+          text-align:center;
+      }
+      .purList .purItem .btn,.accountPanel .btn{
           height:36px;
           background:#c79b00;
           color:#fff;
