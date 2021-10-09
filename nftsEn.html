@@ -130,7 +130,20 @@
         </div>
     </div>
 </section>
-    <div class="igcCon" id="app">
+    <div class="igcCon" id="app" v-clock>
+        <div class="advert-top" v-if="text">
+            <div class="ico-horn">
+                <!-- 喇叭图标 -->
+                <img :src="icon" alt="">
+            </div>
+            <!-- 滚动文字区域 -->
+            <div class="marquee-wrap">
+                <ul class="marquee-box" id="marquee-box">
+                    <!-- 循环3次为了无缝衔接， 给第一个设置Id 方便计算文字宽度 -->
+                    <li class="marquee-list" v-html="text" id="marquee"></li>
+                </ul>
+            </div>
+        </div>
         <section class="nftContainer">
             <ul class="nftProList">
                 <li class="nftProItem" v-for="(item,index) in gemList" :key="index">
@@ -202,6 +215,8 @@
             isAllApproved:false,
             myNft:[],
             myNftTokenIds:[],
+            text:'The Avengers 3.0 Officially Launched',
+            icon:'./images/laba.jpeg',
             gemList:[
                 {
                     active:0,
@@ -236,7 +251,7 @@
                     img:'./images/SpaceStone.jpg',
                     hero:'./images/NFTSbx/Captain.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TEi8qudwatuTA9DNb4fyUT94BgAw6Hprqd',
                     tokenIds:[20001,20002,20003,20004,20005,20006,20007,20008,20009,20010]
                 },
                 {
@@ -254,7 +269,7 @@
                     img:'./images/TimeStone.jpg',
                     hero:'./images/NFTSz/doctor.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TEJoKytJS5YHdPzQvmSjHWpf1hDuBWPDjL',
                     tokenIds:[30001,30002,30003,30004,30005,30006,30007,30008,30009,30010]
                 },
                 {
@@ -272,7 +287,7 @@
                     img:'./images/RealityStone.jpg',
                     hero:'./images/NFTSz/lei.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TSrVpWkUxMVLhBiGdVr2TAjjq3aie73315',
                     tokenIds:[40001,40002,40003,40004,40005,40006,40007,40008,40009,40010]
                 },
                 {
@@ -290,7 +305,7 @@
                     img:'./images/MindeStone.jpg',
                     hero:'./images/NFTSz/huanshi.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TYiwwfFayq8Meq6YRJzQ5Junv7cNoQUnZ8',
                     tokenIds:[50001,50002,50003,50004,50005,50006,50007,50008,50009,50010]
                 },
                 {
@@ -308,7 +323,7 @@
                     img:'./images/SoulStone.jpg',
                     hero:'./images/NFTSz/ironman.jpg',
                     winner:'',
-                    contract:'TPcnwuBfA8C2rvWAChLunfR3tNa7sfmNgN',
+                    contract:'TVFi3Apx5EpM3bdZSteR31bKM7QNszDKZh',
                     tokenIds:[60001,60002,60003,60004,60005,60006,60007,60008,60009,60010]
                 }
             ]
@@ -461,6 +476,21 @@
                     alert('You do not own the gem!')
                 }
             },
+            runMarquee() {
+                // 获取文字 计算后宽度
+                var width = document.getElementById('marquee').getBoundingClientRect().width,
+                    marquee = document.getElementById('marquee-box'),
+                    disx = 0; // 位移距离
+                //设置位移
+                setInterval(() => {
+                    disx--; // disx-=1; 滚动步长
+                    if (-disx >= width) {
+                        disx = 10; // 如果位移超过文字宽度，则回到起点  marquee-list的margin值
+                    }
+                    // marquee.style.transform = 'translateX(' + disx + 'px)'
+                    marquee.style.left = disx + 'px'
+                }, 30) //滚动速度
+            }, 
             initTronWeb() { // 初始化tronweb
                 return new Promise(function(resolve, reject) {
                     const tries = 0
@@ -490,10 +520,18 @@
             this.initTronWeb().then(()=>{
                 this.init()
             })
+        },
+        mounted(){
+            setTimeout(() => {
+                this.runMarquee()
+            }, 1000)
         }
       })
   </script>
   <style>
+     [v-clock]{
+          display:none;
+      }
       body{
           background:#efefef;
       }
@@ -514,6 +552,7 @@
       .nftProItem {
           text-align:center;
           margin:0 20px 40px;
+          height:810px;
       }
       .nftProItem img{
           width:85px;
@@ -639,6 +678,7 @@
       }
       .purList .purItem{
           margin-bottom:20px;
+          width:30%;
       }
       .purList .purItem img{
           width:140px;
@@ -667,6 +707,19 @@
           margin:0 auto;
       }
 
+      .advert-top{position:relative;display:flex;width:100%;height:40px;color:#767676;font-size:24px;align-items:center;max-width:1200px;margin:0 auto;}
+    .ico-horn{display:flex;width:24px;height:24px;justify-content:center;align-items:center}
+    .ico-horn>img{width:24px;height:24px}
+    .marquee-wrap{position:relative;display:flex;overflow:hidden;width:100%;height:100%;margin-left:10px;}
+    .marquee-box{position:absolute;top:50%;display:flex;white-space:nowrap;transform:translateY(-50%)}
+    .marquee-list{margin-right:10px} /* 此处“px”方便回到起点 */
+    .marquee-list span{padding:0 .04rem;color:#ffe17b;font-weight:700}
+@media screen and (max-width:900px) {
+    .purchesePanel .purListPanel .purList{
+        justify-content: center;
+    }
+    .purList .purItem{width:100%;}
+}
   </style>
 </body>
 </html>  
