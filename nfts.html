@@ -538,7 +538,7 @@
                 })
                 let isApproveAll = await this.FNTC['isApprovedForAll'](window.tronWeb.defaultAddress.base58,this.Gloves).call()
                 if(isApproveAll){
-                    await this.GlovesC.synthesis(ids).send({ shouldPollResponse: false }).then((res)=>{
+                    await this.GlovesC.synthesis(ids).send({ shouldPollResponse: true }).then((res)=>{
                         alert('合成手套成功')
                     })
                 }else{
@@ -722,7 +722,7 @@
       .purprice span{
         color: #007bff;
       }
-      .purchesePanel .btn,.myNftList .btn{
+      .purchesePanel .btn,.accountPanel .btn{
           height:36px;
           background:#c79b00;
           color:#fff;
